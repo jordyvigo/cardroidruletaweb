@@ -53,26 +53,46 @@ const User = mongoose.model("User", userSchema);
 
 // Lista de premios corregida para que sumen exactamente 100%
 const prizes = [
-    { text: "10 soles de descuento", probability: 29.88 }, // index 0
-    { text: "50 soles de descuento", probability: 7.35 },  // index 1
-    { text: "100 soles de descuento", probability: 0.02 }, // index 2
-    { text: "Cargador de cigarrera", probability: 0.0001 }, // index 3
-    { text: "Consola gratis", probability: 0.0001 },        // index 4
-    { text: "Mica de vidrio gratis", probability: 6.88 },   // index 5
-    { text: "Parlantes gratis", probability: 0.00001 },     // index 6
-    { text: "Un giro adicional", probability: 11.88 },      // index 7
-    { text: "RADIO 100% GRATIS", probability: 0.0001 },     // index 8
-    { text: "20% de descuento", probability: 0.0001 },      // index 9
-    { text: "Sigue intentando", probability: 23.94 },        // index 10
-    { text: "10% de descuento", probability: 19.94 },       // index 11
-    // { text: "50% de descuento", probability: 0.12 },     // Eliminado para sumar exactamente 100%
+    { text: "10 soles de descuento", probability: 30 }, // index 0
+    { text: "50 soles de descuento", probability: 8 },  // index 1
+    { text: "100 soles de descuento", probability: 0.05 }, // index 2
+    { text: "Cargador de cigarrera", probability: 0.05 }, // index 3
+    { text: "Consola gratis", probability: 0.01 },        // index 4
+    { text: "Mica de vidrio gratis", probability: 10 },   // index 5
+    { text: "Parlantes gratis", probability: 0.09 },     // index 6
+    { text: "Un giro adicional", probability: 12 },      // index 7
+    { text: "RADIO 100% GRATIS", probability: 0.0001 },  // index 8
+    { text: "20% de descuento", probability: 0.02 },      // index 9
+    { text: "Sigue intentando", probability: 24 },        // index 10
+    { text: "10% de descuento", probability: 19.94 },    // index 11
+    // { text: "50% de descuento", probability: 0.12 },  // Eliminado para sumar exactamente 100%
 ];
 
-// Validar que la suma de probabilidades sea 100%
-const totalProbability = prizes.reduce((acc, prize) => acc + prize.probability, 0);
-if (Math.abs(totalProbability - 100) > 0.01) { // Tolerancia de 0.01
-    console.warn(`Advertencia: La suma total de probabilidades es ${totalProbability}, no 100.`);
+// Función para ajustar la probabilidad de "Sigue intentando" si la suma no es 100%
+function ajustarProbabilidades(prizes) {
+    const totalProbability = prizes.reduce((acc, prize) => acc + prize.probability, 0);
+    const tolerancia = 0.01;
+    const diferencia = 100 - totalProbability;
+
+    if (Math.abs(diferencia) > tolerancia) {
+        const premioAjustar = prizes.find(p => p.text.toLowerCase() === "sigue intentando");
+        if (premioAjustar) {
+            premioAjustar.probability += diferencia;
+            console.log(`Probabilidad de "Sigue intentando" ajustada en ${diferencia.toFixed(4)}% para que la suma total sea 100%.`);
+        } else {
+            console.warn(`No se encontró el premio "Sigue intentando" para ajustar la probabilidad.`);
+        }
+    } else {
+        console.log(`La suma total de probabilidades es ${totalProbability.toFixed(4)}%, dentro de la tolerancia.`);
+    }
+
+    // Verificar nuevamente la suma después del ajuste
+    const nuevaSuma = prizes.reduce((acc, prize) => acc + prize.probability, 0);
+    console.log(`Total Probability after adjustment: ${nuevaSuma.toFixed(4)}%`);
 }
+
+// Llamar a la función de ajuste
+ajustarProbabilidades(prizes);
 
 // Obtener fillStyle basado en el texto del premio
 function getFillStyle(text) {
