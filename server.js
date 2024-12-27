@@ -108,14 +108,16 @@ function getFillStyle(text) {
 
 /** GET /api/spin-config */
 app.get("/api/spin-config", async (req, res) => {
+    console.log("Recibiendo solicitud para /api/spin-config");
     try {
         await connectToMongoDB();
+        console.log("Conectado a MongoDB");
         const segments = prizes.map(prize => ({
             text: prize.text,
             fillStyle: getFillStyle(prize.text),
         }));
 
-        console.log("Enviando configuración de la ruleta:", segments);
+        console.log("Configuración de la ruleta:", segments);
 
         // Validar segmentos
         const invalidSegments = segments.filter(segment => !segment.text || typeof segment.text !== 'string');
@@ -140,6 +142,7 @@ app.post("/api/register", async (req, res) => {
     }
 
     try {
+        console.log(`Recibiendo solicitud de registro para la placa: ${plate}`);
         await connectToMongoDB();
         let user = await User.findOne({ plate });
 
@@ -202,6 +205,7 @@ app.post("/api/spin", async (req, res) => {
     }
 
     try {
+        console.log(`Recibiendo solicitud de giro para la placa: ${plate}`);
         await connectToMongoDB();
         const user = await User.findOne({ plate });
         if (!user) {
@@ -294,6 +298,7 @@ app.post("/api/share", async (req, res) => {
     }
 
     try {
+        console.log(`Recibiendo solicitud de share para la placa: ${plate}`);
         await connectToMongoDB();
         const user = await User.findOne({ plate });
         if (!user) {
@@ -327,13 +332,17 @@ app.post("/api/share", async (req, res) => {
     }
 });
 
-// Rutas explícitas para '/' y '/favicon.ico'
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-app.get("/favicon.ico", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "favicon.ico"));
+// Ruta de salud
+app.get("/api/health", async (req, res) => {
+    console.log("Recibiendo solicitud para /api/health");
+    try {
+        await connectToMongoDB();
+        console.log("Conectado a MongoDB para la ruta de salud");
+        res.status(200).send("OK");
+    } catch (error) {
+        console.error("Error en la conexión a MongoDB en ruta de salud:", error.message);
+        res.status(500).send("Error en la conexión a MongoDB");
+    }
 });
 
 // Fallback para rutas no encontradas
