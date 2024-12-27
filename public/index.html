@@ -1,0 +1,153 @@
+<!-- frontend/public/index.html -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>LLEVATE UNA RADIO 100% GRATIS CON LA RULETA CARDROID</title>
+    <link rel="stylesheet" href="style.css"/>
+
+    <!-- Librerías necesarias -->
+    <!-- GSAP 3.x -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
+    
+    <!-- Winwheel.js -->
+    <script src="Winwheel.js" defer></script>
+</head>
+<body>
+    <!-- Música de fondo -->
+    <audio src="assets/fondo.mp3" autoplay loop></audio>
+
+    <!-- Modal de Registro -->
+    <div id="loginModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="modalTitle">
+        <div class="modal-content">
+            <!-- Botón de cerrar eliminado para cumplir con el requerimiento -->
+            <h2 id="modalTitle">Registra tus Datos</h2>
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label for="plate">Placa del Vehículo:</label>
+                    <input 
+                        type="text" 
+                        id="plate" 
+                        name="plate" 
+                        placeholder="ABC123" 
+                        maxlength="6" 
+                        pattern="[A-Z0-9]{6}" 
+                        title="Debe contener exactamente 6 caracteres alfanuméricos (A-Z, 0-9)." 
+                        required
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="phone">Número de Celular:</label>
+                    <input 
+                        type="tel" 
+                        id="phone" 
+                        name="phone" 
+                        placeholder="912345678" 
+                        maxlength="9" 
+                        pattern="[0-9]{9}" 
+                        title="Debe contener exactamente 9 dígitos numéricos." 
+                        required
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="email">Correo Electrónico:</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="correo@ejemplo.com" 
+                        required
+                    />
+                </div>
+                <button type="button" id="submitData" class="modern-button">Acceder</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Popup de Premio -->
+    <div id="prizePopup" class="popup" aria-hidden="true" role="dialog" aria-labelledby="prizeTitle">
+        <div class="popup-content">
+            <h2 id="prizeTitle">¡Felicidades!</h2>
+            <p>Has ganado: <span id="prizeText"></span></p>
+            <div class="prize-actions">
+                <!-- El contenido de prize-actions se actualizará dinámicamente en script.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Términos y Condiciones -->
+    <div id="termsModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="termsTitle">
+        <div class="modal-content">
+            <h2 id="termsTitle">Términos y Condiciones</h2>
+            <p>
+                1. Los premios obtenidos mediante la Ruleta de Descuentos CARDROID no son acumulativos.<br/>
+                2. Solo se puede canjear un premio a la vez por la compra de un producto específico, que es válido para la compra de una radio Android por un valor de 560 soles.<br/>
+                3. Los descuentos se calcularán sobre el precio mencionado anteriormente.<br/>
+                4. Se anulará cualquier intento de trampa o manipulación de la ruleta.<br/>
+                5. Los premios son válidos únicamente para la placa registrada durante el proceso de registro.<br/>
+                6. Los premios no pueden ser transferidos, vendidos ni cedidos a terceros bajo ninguna circunstancia.<br/>
+                7. Cualquier intento de fraude o violación de estos términos resultará en la descalificación inmediata.<br/>
+                8. Los datos registrados se podrán utilizar para publicidad y promociones de la tienda en el futuro.<br/>
+                9. Los participantes aceptan estos términos y condiciones al registrarse y participar en la Ruleta de Descuentos CARDROID.
+            </p>
+            <button id="closeTermsModal" class="close-popup-btn">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <div class="casino-container">
+        <!-- Contenedor de Nieve -->
+        <div id="snowContainer" class="snowflakes" aria-hidden="true"></div>
+
+        <header>
+            <h1 class="main-title">🎰 ¡Gira la Ruleta y llévate una RADIO ANDROID GRATIS! 🎉</h1>
+        </header>
+        <main>
+            <!-- Ruleta -->
+            <section class="wheel-section">
+                <div class="wheel-container">
+                    <!-- Pointer Android Mejorado -->
+                    <img src="assets/android.png" alt="Android señalando" class="android-pointer" />
+                    <canvas 
+                        id="wheelCanvas" 
+                        width="500" 
+                        height="500"
+                        data-responsiveMinWidth="180"
+                        data-responsiveScaleHeight="true"
+                    >
+                    </canvas>
+                </div>
+            </section>
+
+            <!-- Botones de Acción -->
+            <section class="buttons-section">
+                <button id="spinButton" class="spin-btn" disabled>¡Girar la Ruleta! (0)</button>
+                <button id="shareButton" class="share-btn">Compartir en Facebook (+3 giros)</button>
+            </section>
+
+            <!-- Lista de Premios -->
+            <section class="prizes-section">
+                <h2 class="prizes-title">Tus Premios</h2>
+                <div id="prizesList" class="prizes-list">
+                    <!-- Los premios se insertarán aquí dinámicamente -->
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Cardroid | Descuentos para tu Auto</p>
+            <p>
+                <a href="#terms" class="terms-link">Términos y Condiciones</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Script Principal -->
+    <script src="script.js" defer></script>
+</body>
+</html>

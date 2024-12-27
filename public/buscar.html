@@ -1,0 +1,28 @@
+<!-- public/buscar.html -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscar Premios - Ruleta Cardroid</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tu CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="buscar-container">
+        <h1>Buscar Premios</h1>
+        <form id="buscarForm">
+            <label for="buscarPlate">Ingresa tu Placa:</label>
+            <input type="text" id="buscarPlate" name="buscarPlate" required maxlength="6" pattern="[A-Z0-9]{6}" placeholder="ABC123">
+            <button type="submit">Buscar</button>
+        </form>
+        <div id="result" class="result">
+            <!-- Resultados se mostrarán aquí -->
+        </div>
+    </div>
+
+    <!-- Tu JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
