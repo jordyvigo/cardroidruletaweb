@@ -5,7 +5,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
-const serverless = require("serverless-http"); // Añadido para compatibilidad con Vercel
+const serverless = require("serverless-http");
 
 const app = express();
 
@@ -20,17 +20,35 @@ if (!process.env.MONGODB_URI) {
     process.exit(1);
 }
 
-// Conexión a MongoDB
-async function connectToMongoDB() {
-    try {
-        await mongoose.connect(process.env.MONGODB_URI);
-        console.log("Conexión exitosa a MongoDB Atlas");
-    } catch (err) {
-        console.error("Error al conectar a MongoDB Atlas:", err.message);
-        process.exit(1);
-    }
+// Caché de la conexión a MongoDB
+let cached = global.mongoose;
+
+if (!cached) {
+    cached = global.mongoose = { conn: null, promise: null };
 }
-connectToMongoDB();
+
+async function connectToMongoDB() {
+    if (cached.conn) {
+        return cached.conn;
+    }
+
+    if (!cached.promise) {
+        const opts = {
+            bufferCommands: false,
+            // Puedes añadir más opciones de conexión si es necesario
+        };
+
+        cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => {
+            return mongoose;
+        }).catch((err) => {
+            cached.promise = null;
+            throw err;
+        });
+    }
+
+    cached.conn = await cached.promise;
+    return cached.conn;
+}
 
 // Esquema de usuario
 const userSchema = new mongoose.Schema({
@@ -49,20 +67,20 @@ const userSchema = new mongoose.Schema({
     ],
 }, { timestamps: true });
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 // Lista de premios corregida para que sumen exactamente 100%
 const prizes = [
     { text: "10 soles de descuento", probability: 28 },      // index 0
     { text: "50 soles de descuento", probability: 7 },       // index 1
     { text: "100 soles de descuento", probability: 1 },      // index 2
-    { text: "Cargador de cigarrera", probability: 0.989 },       // index 3
+    { text: "Cargador de cigarrera", probability: 1 },       // index 3
     { text: "Consola gratis", probability: 2 },             // index 4
     { text: "Mica de vidrio gratis", probability: 8 },       // index 5
     { text: "Parlantes gratis", probability: 2 },            // index 6
     { text: "Un giro adicional", probability: 11 },          // index 7
-    { text: "RADIO 100% GRATIS", probability: 0.001 },           // index 8
-    { text: "20% de descuento", probability: 0.01 },            // index 9
+    { text: "RADIO 100% GRATIS", probability: 0 },           // index 8
+    { text: "20% de descuento", probability: 0 },            // index 9
     { text: "Sigue intentando", probability: 34 },            // index 10
     { text: "10% de descuento", probability: 10 },           // index 11
     // { text: "50% de descuento", probability: 0.12 },      // Eliminado para sumar exactamente 100%
@@ -90,8 +108,9 @@ function getFillStyle(text) {
 }
 
 /** GET /api/spin-config */
-app.get("/api/spin-config", (req, res) => {
+app.get("/api/spin-config", async (req, res) => {
     try {
+        await connectToMongoDB();
         const segments = prizes.map(prize => ({
             text: prize.text,
             fillStyle: getFillStyle(prize.text),
@@ -122,6 +141,7 @@ app.post("/api/register", async (req, res) => {
     }
 
     try {
+        await connectToMongoDB();
         let user = await User.findOne({ plate });
 
         if (user) {
@@ -183,6 +203,7 @@ app.post("/api/spin", async (req, res) => {
     }
 
     try {
+        await connectToMongoDB();
         const user = await User.findOne({ plate });
         if (!user) {
             console.warn(`Usuario no encontrado para la placa: ${plate}`);
@@ -274,6 +295,7 @@ app.post("/api/share", async (req, res) => {
     }
 
     try {
+        await connectToMongoDB();
         const user = await User.findOne({ plate });
         if (!user) {
             console.warn(`Usuario no encontrado para la placa: ${plate}`);
@@ -304,6 +326,15 @@ app.post("/api/share", async (req, res) => {
             error: err.message,
         });
     }
+});
+
+// Rutas explícitas para '/' y '/favicon.ico'
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+app.get("/favicon.ico", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "favicon.ico"));
 });
 
 // Fallback para rutas no encontradas
