@@ -314,11 +314,6 @@ app.post("/api/share", async (req, res) => {
     }
 });
 
-// Ruta para servir la página /buscar (dejada de lado por ahora)
-app.get("/buscar", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "buscar.html"));
-});
-
 // Fallback para rutas no encontradas
 app.use((req, res) => {
     console.warn(`Ruta no encontrada: ${req.method} ${req.url}`);
@@ -326,12 +321,4 @@ app.use((req, res) => {
 });
 
 // Exportar la aplicación Express para Vercel
-module.exports = app;
-
-// Iniciar servidor si no está en un entorno serverless
-if (process.env.NODE_ENV !== "production") {
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-        console.log(`Servidor corriendo en http://localhost:${PORT}`);
-    });
-}
+module.exports.handler = serverless(app);
