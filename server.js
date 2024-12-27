@@ -23,10 +23,7 @@ if (!process.env.MONGODB_URI) {
 // Conexión a MongoDB
 async function connectToMongoDB() {
     try {
-        await mongoose.connect(process.env.MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        await mongoose.connect(process.env.MONGODB_URI);
         console.log("Conexión exitosa a MongoDB Atlas");
     } catch (err) {
         console.error("Error al conectar a MongoDB Atlas:", err.message);
@@ -57,16 +54,16 @@ const User = mongoose.model("User", userSchema);
 // Lista de premios corregida para que sumen exactamente 100%
 const prizes = [
     { text: "10 soles de descuento", probability: 29.88 }, // index 0
-    { text: "50 soles de descuento", probability: 7.35 },  // index 1 (Aumentado en 2%)
+    { text: "50 soles de descuento", probability: 7.35 },  // index 1
     { text: "100 soles de descuento", probability: 0.02 }, // index 2
     { text: "Cargador de cigarrera", probability: 0.0001 }, // index 3
     { text: "Consola gratis", probability: 0.0001 },        // index 4
-    { text: "Mica de vidrio gratis", probability: 6.88 },   // index 5 (Aumentado en 2%)
+    { text: "Mica de vidrio gratis", probability: 6.88 },   // index 5
     { text: "Parlantes gratis", probability: 0.00001 },     // index 6
-    { text: "Un giro adicional", probability: 11.88 },      // index 7 (Aumentado en 2%)
+    { text: "Un giro adicional", probability: 11.88 },      // index 7
     { text: "RADIO 100% GRATIS", probability: 0.0001 },     // index 8
     { text: "20% de descuento", probability: 0.0001 },      // index 9
-    { text: "Sigue intentando", probability: 23.94 },        // index 10 (Reducido en 6%)
+    { text: "Sigue intentando", probability: 23.94 },        // index 10
     { text: "10% de descuento", probability: 19.94 },       // index 11
     // { text: "50% de descuento", probability: 0.12 },     // Eliminado para sumar exactamente 100%
 ];
