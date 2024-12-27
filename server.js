@@ -321,4 +321,4 @@ app.use((req, res) => {
 });
 
 // Exportar la aplicación Express para Vercel
-module.exports.handler = serverless(app);
+module.exports = serverless(app);
