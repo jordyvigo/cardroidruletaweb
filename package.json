@@ -9,6 +9,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.1",
+    "find-config": "^1.0.0",
     "mongoose": "^8.8.3",
     "serverless-http": "^3.2.0"
   }
