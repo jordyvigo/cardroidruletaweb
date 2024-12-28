@@ -3,7 +3,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const path = require("path");
 const serverless = require("serverless-http");
 
 const app = express();
@@ -11,10 +10,6 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// Middleware para servir archivos estáticos si es necesario
-// Nota: En un despliegue separado, esto puede no ser necesario
-// app.use(express.static(path.join(__dirname, "public")));
 
 // Verificar variable de entorno MONGODB_URI
 if (!process.env.MONGODB_URI) {
@@ -201,7 +196,7 @@ app.post("/api/register", async (req, res) => {
       error: err.message,
     });
   }
-});
+}
 
 /** Obtener premio basado en probabilidad */
 function getPrize(prizes) {
@@ -388,6 +383,11 @@ app.get("/api/health", async (req, res) => {
   }
 });
 
+// **Nueva Ruta para GET /**
+app.get("/", (req, res) => {
+  res.status(200).send("Backend API de Cardroid Ruleta funcionando.");
+});
+
 // Fallback para rutas no encontradas
 app.use((req, res) => {
   console.warn(`Ruta no encontrada: ${req.method} ${req.url}`);
@@ -396,3 +396,22 @@ app.use((req, res) => {
 
 // Exportar la aplicación Express para Vercel
 module.exports = serverless(app);
+
+// Handle uncaught exceptions and rejections
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err.message);
+  // Opcional: Puedes reiniciar el proceso o realizar limpieza
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
+  // Opcional: Puedes reiniciar el proceso o realizar limpieza
+});
+
+/* **Eliminar app.listen() en Entornos Serverless **
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+*/
