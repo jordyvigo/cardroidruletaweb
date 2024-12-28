@@ -196,7 +196,7 @@ app.post("/api/register", async (req, res) => {
       error: err.message,
     });
   }
-}
+}); // <-- **Añadido paréntesis de cierre aquí**
 
 /** Obtener premio basado en probabilidad */
 function getPrize(prizes) {
