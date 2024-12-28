@@ -1,9 +1,5 @@
 // server.js
 
-const dotenvPath = require("find-config")(".env");
-
-require("dotenv").config({ path: dotenvPath });
-
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -15,13 +11,14 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+
+// Middleware para servir archivos estáticos si es necesario
+// Nota: En un despliegue separado, esto puede no ser necesario
+// app.use(express.static(path.join(__dirname, "public")));
 
 // Verificar variable de entorno MONGODB_URI
 if (!process.env.MONGODB_URI) {
-  console.error(
-    "Error: La variable de entorno MONGODB_URI no está configurada."
-  );
+  console.error("Error: La variable de entorno MONGODB_URI no está configurada.");
   process.exit(1);
 }
 
@@ -50,8 +47,7 @@ async function connectToMongoDB() {
       })
       .catch((err) => {
         cached.promise = null;
-        console.error("Error connecting to MongoDB:", err.message);
-        // Do not throw error to prevent server from closing
+        console.error("Error conectando a MongoDB:", err.message);
         return null;
       });
   }
@@ -400,20 +396,3 @@ app.use((req, res) => {
 
 // Exportar la aplicación Express para Vercel
 module.exports = serverless(app);
-
-// Handle uncaught exceptions and rejections
-process.on("uncaughtException", (err) => {
-  console.error("Uncaught Exception:", err.message);
-  // Optionally, you can restart the process or perform cleanup
-});
-
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled Rejection at:", promise, "reason:", reason);
-  // Optionally, you can restart the process or perform cleanup
-});
-
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
